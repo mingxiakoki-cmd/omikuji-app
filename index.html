@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>おみくじアプリ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .omikuji-box {
+            background: linear-gradient(145deg, #f0f0f0, #ffffff);
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .fortune-level {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .fortune-message {
+            font-size: 1.1em;
+            color: #555;
+            line-height: 1.8;
+            margin-top: 10px;
+        }
+
+        .initial-message {
+            font-size: 1.2em;
+            color: #999;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .emoji {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎌 おみくじ 🎌</h1>
+        <p class="subtitle">今日の運勢を占いましょう</p>
+        
+        <div class="omikuji-box" id="omikujiBox">
+            <div class="initial-message">おみくじを引いてください</div>
+        </div>
+        
+        <button onclick="drawOmikuji()" id="drawButton">おみくじを引く</button>
+    </div>
+
+    <script>
+        const fortunes = [
+            {
+                level: "大吉",
+                emoji: "🌟",
+                messages: [
+                    "最高の運気です！何事も上手くいくでしょう。",
+                    "素晴らしい一日になります。積極的に行動しましょう。",
+                    "幸運が訪れる予感。チャンスを逃さないで。"
+                ]
+            },
+            {
+                level: "中吉",
+                emoji: "😊",
+                messages: [
+                    "良い運気です。努力が報われるでしょう。",
+                    "順調な一日。計画通りに進みそうです。",
+                    "落ち着いて行動すれば良い結果が待っています。"
+                ]
+            },
+            {
+                level: "小吉",
+                emoji: "🙂",
+                messages: [
+                    "穏やかな運気です。焦らず着実に。",
+                    "小さな幸せが見つかりそうです。",
+                    "コツコツと努力を続けましょう。"
+                ]
+            },
+            {
+                level: "吉",
+                emoji: "✨",
+                messages: [
+                    "まずまずの運気。慎重に行動しましょう。",
+                    "普段通りを心がければ大丈夫です。",
+                    "周りの人に感謝の気持ちを忘れずに。"
+                ]
+            },
+            {
+                level: "末吉",
+                emoji: "🌱",
+                messages: [
+                    "これから良くなる兆し。希望を持って。",
+                    "焦らず時を待ちましょう。",
+                    "準備をしっかりすることが大切です。"
+                ]
+            },
+            {
+                level: "凶",
+                emoji: "☁️",
+                messages: [
+                    "慎重な行動が必要です。無理は禁物。",
+                    "今は休息の時。明日は良い日が来ます。",
+                    "困難は成長のチャンス。前向きに。"
+                ]
+            }
+        ];
+
+        function drawOmikuji() {
+            const box = document.getElementById('omikujiBox');
+            const button = document.getElementById('drawButton');
+            
+            // ボタンを一時的に無効化
+            button.disabled = true;
+            
+            // 箱を揺らす
+            box.classList.add('shake');
+            
+            setTimeout(() => {
+                box.classList.remove('shake');
+                
+                // ランダムにおみくじを選択
+                const randomFortune = fortunes[Math.floor(Math.random() * fortunes.length)];
+                const randomMessage = randomFortune.messages[Math.floor(Math.random() * randomFortune.messages.length)];
+                
+                // 結果を表示
+                box.innerHTML = `
+                    <div class="emoji">${randomFortune.emoji}</div>
+                    <div class="fortune-level">${randomFortune.level}</div>
+                    <div class="fortune-message">${randomMessage}</div>
+                `;
+                
+                box.classList.add('fade-in');
+                
+                setTimeout(() => {
+                    box.classList.remove('fade-in');
+                    button.disabled = false;
+                }, 800);
+            }, 500);
+        }
+    </script>
+</body>
+</html>
