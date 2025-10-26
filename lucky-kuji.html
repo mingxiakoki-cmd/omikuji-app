@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ラッキーくじ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.9em;
+        }
+
+        .lucky-box {
+            background: linear-gradient(145deg, #fff9e6, #ffffff);
+            border: 3px solid #ffd700;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            min-height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .lucky-percentage {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .lucky-message {
+            font-size: 1.1em;
+            color: #555;
+            line-height: 1.8;
+            margin-top: 10px;
+        }
+
+        .initial-message {
+            font-size: 1.2em;
+            color: #999;
+        }
+
+        button {
+            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+            20%, 40%, 60%, 80% { transform: translateX(10px); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.8s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .emoji {
+            font-size: 3em;
+            margin-bottom: 15px;
+            animation: bounce 1s ease-in-out;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .lucky-10 { color: #8b7355; }
+        .lucky-20 { color: #cd853f; }
+        .lucky-30 { color: #daa520; }
+        .lucky-40 { color: #ffa500; }
+        .lucky-50 { color: #ff8c00; }
+        .lucky-60 { color: #ff6347; }
+        .lucky-70 { color: #ff1493; }
+        .lucky-80 { color: #9370db; }
+        .lucky-90 { color: #4169e1; }
+        .lucky-100 { color: #ffd700; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍀 ラッキーくじ 🍀</h1>
+        <p class="subtitle">今日のラッキー度をチェック！</p>
+        
+        <div class="lucky-box" id="luckyBox">
+            <div class="initial-message">ラッキーくじを引いてみよう</div>
+        </div>
+        
+        <button onclick="drawLucky()" id="drawButton">くじを引く</button>
+    </div>
+
+    <script>
+        const luckyLevels = [
+            {
+                percentage: 10,
+                emoji: "🌱",
+                messages: [
+                    "今日は小さな発見がありそう。足元の花に気づけるかも。",
+                    "いつもと違う道を通ってみると、新しい景色に出会えるかも。",
+                    "何気ない会話が心を温めてくれそう。"
+                ]
+            },
+            {
+                percentage: 20,
+                emoji: "☕",
+                messages: [
+                    "コーヒーやお茶が、いつもより美味しく感じられそう。",
+                    "お気に入りの曲が偶然流れてくるかも。",
+                    "探し物が意外なところから見つかりそう。"
+                ]
+            },
+            {
+                percentage: 30,
+                emoji: "📚",
+                messages: [
+                    "ふと手に取った本に、心に響く言葉が見つかりそう。",
+                    "仕事や勉強が、思ったよりスムーズに進みそう。",
+                    "小さな達成感を味わえる一日になりそう。"
+                ]
+            },
+            {
+                percentage: 40,
+                emoji: "🌤️",
+                messages: [
+                    "雲の切れ間から差し込む陽射しが、心地よく感じられそう。",
+                    "誰かの笑顔に、元気をもらえる日。",
+                    "ちょっとした工夫で、いつもの作業が楽しくなりそう。"
+                ]
+            },
+            {
+                percentage: 50,
+                emoji: "🎵",
+                messages: [
+                    "好きな音楽を聴きながら、心が軽くなる時間が持てそう。",
+                    "偶然の出会いが、良い刺激になりそう。",
+                    "自分のペースで進められる、穏やかな一日。"
+                ]
+            },
+            {
+                percentage: 60,
+                emoji: "🍀",
+                messages: [
+                    "予想外のラッキーが転がり込んでくるかも。",
+                    "ちょっとした親切が、誰かを笑顔にできそう。",
+                    "待っていた返事が、良い形で届きそう。"
+                ]
+            },
+            {
+                percentage: 70,
+                emoji: "✨",
+                messages: [
+                    "人との繋がりが、新しいチャンスを運んできそう。",
+                    "やってみたかったことに、挑戦するのに良い日。",
+                    "直感が冴えている日。迷ったら直感を信じて。"
+                ]
+            },
+            {
+                percentage: 80,
+                emoji: "🌈",
+                messages: [
+                    "嬉しいサプライズがありそう。期待しすぎずに待ってみて。",
+                    "頑張ってきたことが、ちゃんと認められる予感。",
+                    "大切な人との時間が、特別なものになりそう。"
+                ]
+            },
+            {
+                percentage: 90,
+                emoji: "🎁",
+                messages: [
+                    "思いがけないプレゼントや嬉しい知らせが届きそう。",
+                    "悩んでいたことに、良い解決策が見つかりそう。",
+                    "周りの人たちとの絆が、より深まる一日。"
+                ]
+            },
+            {
+                percentage: 100,
+                emoji: "🌟",
+                messages: [
+                    "今日は何をしても楽しい一日になりそう。素敵な時間を！",
+                    "小さな幸せがたくさん集まって、心が満たされる日。",
+                    "あなたの笑顔が、周りの人も幸せにする日。"
+                ]
+            }
+        ];
+
+        function drawLucky() {
+            const box = document.getElementById('luckyBox');
+            const button = document.getElementById('drawButton');
+            
+            // ボタンを一時的に無効化
+            button.disabled = true;
+            
+            // 箱を揺らす
+            box.classList.add('shake');
+            
+            setTimeout(() => {
+                box.classList.remove('shake');
+                
+                // ランダムにラッキー度を選択
+                const randomLevel = luckyLevels[Math.floor(Math.random() * luckyLevels.length)];
+                const randomMessage = randomLevel.messages[Math.floor(Math.random() * randomLevel.messages.length)];
+                
+                // 色のクラスを決定
+                const colorClass = `lucky-${randomLevel.percentage}`;
+                
+                // 結果を表示
+                box.innerHTML = `
+                    <div class="emoji">${randomLevel.emoji}</div>
+                    <div class="lucky-percentage ${colorClass}">${randomLevel.percentage}%</div>
+                    <div class="lucky-message">${randomMessage}</div>
+                `;
+                
+                box.classList.add('fade-in');
+                
+                setTimeout(() => {
+                    box.classList.remove('fade-in');
+                    button.disabled = false;
+                }, 800);
+            }, 500);
+        }
+    </script>
+</body>
+</html>
